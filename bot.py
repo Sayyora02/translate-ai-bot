@@ -154,4 +154,29 @@ def callback_query(call):
 set_bot_menu()
 print("Translate AI: Ko'p tilli versiya ishga tushdi...")
 keep_alive()
-bot.infinity_polling()
+from flask import Flask
+from threading import Thread
+import os
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Men uyg'oqman!"
+
+def run():
+    # Render avtomatik ravishda PORT belgilaydi, u yo'q bo'lsa 8080 ishlaydi
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Kodning eng oxirida botni mana bunday tartibda ishga tushiring:
+if name == "main":
+    keep_alive()  # Kichik veb-serverni fonda ishga tushiradi
+    print("Veb-server yondi! Bot yuklanmoqda...")
+    
+    # Sizning eski ishga tushirish kodingiz:
+    bot.infinity_polling()
