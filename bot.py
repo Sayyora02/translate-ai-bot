@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from flask import Flask
 from threading import Thread
 
@@ -23,6 +24,18 @@ from deep_translator import GoogleTranslator
 # O'zingizning maxfiy tokengingizni yozing
 TOKEN = "8952654425:AAEdEI9S4DFFO1trKPa8GqFUwbv-nVANWd4"
 bot = telebot.TeleBot(TOKEN)
+# Ma'lumotlar bazasini yaratish va ulash
+conn = sqlite3.connect("bot_users.db", check_same_thread=False)
+cursor = conn.cursor()
+
+# Foydalanuvchilar jadvalini yaratish (agar mavjud bo'lmasa)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT
+)
+""")
+conn.commit()
 
 # Foydalanuvchilarning tanlagan tillarini eslab qolish uchun lug'at
 user_languages = {}
@@ -100,6 +113,15 @@ def get_extra_keyboard():
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
+    user_id = message.from_user.id
+    username = message.from_user.username
+    
+    # Foydalanuvchini bazaga tekshirib qo'shish
+    try:
+        cursor.execute("INSERT OR IGNORE INTO users (user_id, username) VALUES (?, ?)", (user_id, username))
+        conn.commit()
+    except Exception as e:
+        print(f"Bazaga yozishda xato: {e}")    
     salom_matni = "👋 Translate AI botiga xush kelibsiz!\n\n🌍 Matnlarni qaysi tilga tarjima qilishni tanlang:"
     bot.reply_to(message, salom_matni, parse_mode="Markdown", reply_markup=get_main_keyboard())
 
@@ -174,6 +196,17 @@ def keep_alive():
     t.start()
 
 # Kodning eng oxirida botni mana bunday tartibda ishga tushiring:
+ADMIN_ID = 6295909661  # Bu yerga o'zingizning Telegram ID raqamingizni yozing!
+
+@bot.message_handler(commands=['stat'])
+def send_stats(message):
+    if message.from_user.id == ADMIN_ID:
+        cursor.execute("SELECT COUNT(*) FROM users")
+        total_users = cursor.fetchone()[0]
+        
+        bot.reply_to(message, f"📊 Bot statistikasi:\n\n👥 Jami foydalanuvchilar: {total_users} ta")
+    else:
+        bot.reply_to(message, "Bu buyruq faqat bot admini uchun! ❌")
 if __name__ == "__main__":
     keep_alive()  # Kichik veb-serverni fonda ishga tushiradi
     print("Veb-server yondi! Bot yuklanmoqda...")
