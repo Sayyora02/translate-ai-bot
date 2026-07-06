@@ -1,3 +1,21 @@
+import os
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot onlayn rejimda ishlamoqda!"
+
+def run():
+    # Render beradigan portni avtomatik aniqlaydi
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 from deep_translator import GoogleTranslator
@@ -135,4 +153,5 @@ def callback_query(call):
 
 set_bot_menu()
 print("Translate AI: Ko'p tilli versiya ishga tushdi...")
+keep_alive()
 bot.infinity_polling()
