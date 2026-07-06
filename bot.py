@@ -174,7 +174,7 @@ def keep_alive():
     t.start()
 
 # Kodning eng oxirida botni mana bunday tartibda ishga tushiring:
-if name == "main":
+if __name__ == "__main__":
     keep_alive()  # Kichik veb-serverni fonda ishga tushiradi
     print("Veb-server yondi! Bot yuklanmoqda...")
     
