@@ -227,6 +227,14 @@ def keep_alive():
 
 # --- LOYIHANI ISHGA TUSHIRISH ---
 if __name__ == "__main__":
-    keep_alive()  # Kichik veb-serverni fonda ishga tushiradi
+    keep_alive()  # Kichik veb-serverni fonda ishga tushirish
     print("Veb-server yondi! Bot yuklanmoqda...")
-    bot.infinity_polling()
+    
+    # Mana shu joyiga yangi xavfsiz kodni qo'yamiz:
+    import time
+    while True:
+        try:
+            bot.polling(none_stop=True, interval=0, timeout=20)
+        except Exception as e:
+            print(f"Xatolik yuz berdi: {e}")
+            time.sleep(5)
