@@ -227,10 +227,9 @@ def keep_alive():
 
 # --- LOYIHANI ISHGA TUSHIRISH ---
 if __name__ == "__main__":
-    keep_alive()  # Kichik veb-serverni fonda ishga tushirish
+    keep_alive()  
     print("Veb-server yondi! Bot yuklanmoqda...")
     
-    # Mana shu joyiga yangi xavfsiz kodni qo'yamiz:
     import time
     while True:
         try:
