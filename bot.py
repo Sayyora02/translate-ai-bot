@@ -15,7 +15,7 @@ ADMIN_ID = 6295909661  # Telegram ID raqamingizni yozing!
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Sun'iy intellektni (Gemini) sozlash
-genai.configure(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY, transport="rest")
 ai_model = genai.GenerativeModel(
     model_name="gemini-1.5-flash",
     system_instruction=(
