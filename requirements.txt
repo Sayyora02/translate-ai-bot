@@ -1,3 +1,4 @@
 pyTelegramBotAPI
 deep-translator
 flask
+google-generativeai
