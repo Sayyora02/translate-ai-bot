@@ -4,7 +4,7 @@ from threading import Thread
 import telebot
 from telebot import types
 import google.generativeai as genai
-from flask import Flask
+from flask import Flask, request
 
 # TOKEN VA SOZLAMALAR (O'zingiznikini qo'ying)
 BOT_TOKEN = "8952654425:AAEdEI9S4DFFO1trKPa8GqFUwbv-nVANWd4"
@@ -220,20 +220,32 @@ def run():
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
 
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
+import os
+from flask import Flask, request
+import telebot
 
+# Kodingizdagi mavjud Flask app'ingiz nomi (agar nomi 'app' bo'lsa shunday qoladi)
+# Agar tepada 'app = Flask(...)' deb yozilgan bo'lsa, quyidagi qator shart emas.
+app = Flask(name)
 
-# --- LOYIHANI ISHGA TUSHIRISH ---
+# Render taqdim etadigan havola (Buni Render panelidan olasiz, masalan: https://translate-ai-bot.onrender.com)
+# O'zingizning botingiz URL manzilini yozing:
+RENDER_URL = "https://translate-ai-bot.onrender.com" 
+
+@app.route('/' + BOT_TOKEN, methods=['POST'])
+def getMessage():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=RENDER_URL + '/' + BOT_TOKEN)
+    return "Bot muvaffaqiyatli Webhook-ga ulandi!", 200
+
 if __name__ == "__main__":
-    keep_alive()  
-    print("Veb-server yondi! Bot yuklanmoqda...")
-    
-    import time
-    while True:
-        try:
-            bot.polling(none_stop=True, interval=0, timeout=20)
-        except Exception as e:
-            print(f"Xatolik yuz berdi: {e}")
-            time.sleep(5)
+    # Render avtomatik ravishda PORT muhit o'zgaruvchisini beradi
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
